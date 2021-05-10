@@ -103,10 +103,10 @@ def make_cfg(settings):
             "move_forward", habitat_sim.agent.ActuationSpec(amount=0.03)
         ),
         "turn_left": habitat_sim.agent.ActionSpec(
-            "turn_left", habitat_sim.agent.ActuationSpec(amount=0.5)
+            "turn_left", habitat_sim.agent.ActuationSpec(amount=1.0)
         ),
         "turn_right": habitat_sim.agent.ActionSpec(
-            "turn_right", habitat_sim.agent.ActuationSpec(amount=0.5)
+            "turn_right", habitat_sim.agent.ActuationSpec(amount=1.0)
         ),
         "do_nothing": habitat_sim.agent.ActionSpec(
             "turn_right", habitat_sim.agent.ActuationSpec(amount=0.0)
@@ -242,7 +242,7 @@ while keystroke != ord(FINISH):
     filename = os.path.join(right_path, str(frame_id).zfill(6) + ".png")
     right_img.save(filename)
 
-    curr_time_float = 0.0
+    curr_time_float += 1 / frame_rate
     curr_time = "{:e}".format(curr_time_float)
     agent_state = agent.get_state()
     initial_height = -agent_state.position[1]

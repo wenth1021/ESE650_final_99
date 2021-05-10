@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d42065eb-2266-4514-927a-36bf94b8aad5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/image_pose_extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/image_pose_extract.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Stereo.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stereo_extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/stereo_extract.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,14 +28,23 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/image_pose_extract.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="455">
-                  <caret line="259" column="18" selection-start-line="198" selection-end-line="259" selection-end-column="18" />
+                <state relative-caret-position="245">
+                  <caret line="224" column="45" lean-forward="true" selection-start-line="224" selection-start-column="45" selection-end-line="224" selection-end-column="45" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/Stereo.yaml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="510">
+                  <caret line="64" column="20" lean-forward="true" selection-start-line="64" selection-start-column="20" selection-end-line="64" selection-end-column="20" />
                 </state>
               </provider>
             </entry>
@@ -67,8 +77,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/stereo_extract.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="410">
-                  <caret line="257" column="23" selection-end-line="263" selection-end-column="17" />
+                <state relative-caret-position="245">
+                  <caret line="93" column="19" lean-forward="true" selection-start-line="93" selection-start-column="19" selection-end-line="93" selection-end-column="19" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -103,6 +113,7 @@
         <option value="$PROJECT_DIR$/scripts/evaluate_ate.py" />
         <option value="$PROJECT_DIR$/image_pose_extract.py" />
         <option value="$PROJECT_DIR$/stereo_extract.py" />
+        <option value="$PROJECT_DIR$/Stereo.yaml" />
       </list>
     </option>
   </component>
@@ -141,6 +152,11 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -263,23 +279,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/image_pose_extract.py">
+    <entry file="file://$PROJECT_DIR$/stereo_extract.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="259" column="18" selection-start-line="198" selection-end-line="259" selection-end-column="18" />
+        <state relative-caret-position="245">
+          <caret line="93" column="19" lean-forward="true" selection-start-line="93" selection-start-column="19" selection-end-line="93" selection-end-column="19" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stereo_extract.py">
+    <entry file="file://$PROJECT_DIR$/image_pose_extract.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="410">
-          <caret line="257" column="23" selection-end-line="263" selection-end-column="17" />
+        <state relative-caret-position="245">
+          <caret line="224" column="45" lean-forward="true" selection-start-line="224" selection-start-column="45" selection-end-line="224" selection-end-column="45" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Stereo.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="64" column="20" lean-forward="true" selection-start-line="64" selection-start-column="20" selection-end-line="64" selection-end-column="20" />
         </state>
       </provider>
     </entry>

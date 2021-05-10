@@ -182,11 +182,11 @@ curr_time = format(curr_time_float, '.6f')
 agent_state = agent.get_state()
 file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
                                                format(agent_state.position[0], '.4f'),
-                                               format(agent_state.position[1], '.4f'),
-                                               format(agent_state.position[2], '.4f'),
-                                               format(quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
-                                               format(quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
-                                               format(quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
+                                               format(-agent_state.position[1], '.4f'),
+                                               format(-agent_state.position[2], '.4f'),
+                                               format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
+                                               format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
+                                               format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
                                                format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
                                                ))
 file_rgb.write("{} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png"))

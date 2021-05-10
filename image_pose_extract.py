@@ -165,7 +165,7 @@ file_assoc.truncate(0)
 
 # save initial frame
 frame_id = 0
-observations = sim.step("turn_right")
+observations = sim.step("do_nothing")
 rgb_obs = observations["color_sensor"]
 cv2.imshow("RGB", transform_rgb_bgr(rgb_obs))
 # save files

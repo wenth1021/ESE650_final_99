@@ -30,7 +30,7 @@ FINISH="f"
 frame_rate = 30.0
 
 # save directory
-output_directory = "examples/apartment_2"  # @param {type:"string"}
+output_directory = "examples/apartment_0"  # @param {type:"string"}
 output_path = os.path.join(output_directory)
 rgb_path = os.path.join(output_path, "rgb")
 depth_path = os.path.join(output_path, "depth")
@@ -165,7 +165,7 @@ file_assoc.truncate(0)
 
 # save initial frame
 frame_id = 0
-observations = sim.step("do_nothing")
+observations = sim.step("turn_right")
 rgb_obs = observations["color_sensor"]
 cv2.imshow("RGB", transform_rgb_bgr(rgb_obs))
 # save files
@@ -180,15 +180,16 @@ depth_img.save(filename)
 curr_time_float = time.time()
 curr_time = format(curr_time_float, '.6f')
 agent_state = agent.get_state()
+initial_height = -agent_state.position[1]
 file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                               format(agent_state.position[0], '.4f'),
-                                               format(-agent_state.position[1], '.4f'),
-                                               format(-agent_state.position[2], '.4f'),
-                                               format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
-                                               format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
-                                               format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
-                                               format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
-                                               ))
+                                                   format(agent_state.position[0], '.4f'),
+                                                   format(-agent_state.position[1] - initial_height, '.4f'),
+                                                   format(-agent_state.position[2], '.4f'),
+                                                   format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
+                                                   format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
+                                                   format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
+                                                   format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
+                                                   ))
 file_rgb.write("{} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png"))
 file_depth.write("{} {}\n".format(curr_time, "depth/" + str(frame_id) + ".png"))
 file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png",
@@ -238,14 +239,14 @@ while keystroke != ord(FINISH):
     curr_time = format(curr_time_float, '.6f')
     agent_state = agent.get_state()
     file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                   format(agent_state.position[0], '.4f'),
-                                                   format(agent_state.position[1], '.4f'),
-                                                   format(agent_state.position[2], '.4f'),
-                                                   format(quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
-                                                   format(quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
-                                                   format(quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
-                                                   format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
-                                                   ))
+                                                     format(agent_state.position[0], '.4f'),
+                                                     format(-agent_state.position[1] - initial_height, '.4f'),
+                                                     format(-agent_state.position[2], '.4f'),
+                                                     format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
+                                                     format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
+                                                     format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
+                                                     format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
+                                                     ))
     file_rgb.write("{} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png"))
     file_depth.write("{} {}\n".format(curr_time, "depth/" + str(frame_id) + ".png"))
     file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png",

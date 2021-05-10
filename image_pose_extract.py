@@ -83,10 +83,10 @@ def make_cfg(settings):
             "move_forward", habitat_sim.agent.ActuationSpec(amount=0.03)
         ),
         "turn_left": habitat_sim.agent.ActionSpec(
-            "turn_left", habitat_sim.agent.ActuationSpec(amount=0.3)
+            "turn_left", habitat_sim.agent.ActuationSpec(amount=0.5)
         ),
         "turn_right": habitat_sim.agent.ActionSpec(
-            "turn_right", habitat_sim.agent.ActuationSpec(amount=0.3)
+            "turn_right", habitat_sim.agent.ActuationSpec(amount=0.5)
         ),
         "do_nothing": habitat_sim.agent.ActionSpec(
             "turn_right", habitat_sim.agent.ActuationSpec(amount=0.0)
@@ -204,16 +204,16 @@ while keystroke != ord(FINISH):
 
     if keystroke == ord(FORWARD_KEY):
         action = "move_forward"
-        print("action", action)
+        #print("action", action)
     elif keystroke == ord(LEFT_KEY):
         action = "turn_left"
-        print("action", action)
+        #print("action", action)
     elif keystroke == ord(RIGHT_KEY):
         action = "turn_right"
-        print("action", action)
+        #print("action", action)
     elif keystroke == ord(FINISH):
         sim.close()
-        print("action", action)
+        #print("action", action)
         continue
     else:
         print("INVALID KEY")

@@ -197,11 +197,11 @@ curr_time_rgbd = time.time()
 curr_time = format(curr_time_rgbd, '.6f')
 agent_state = agent.get_state()
 sensor_pos = agent._sensors['left_sensor'].specification().position
-initial_pos = sensor_pos
+initial_pos = agent_state.position + sensor_pos
 file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                   format((sensor_pos - initial_pos)[0], '.4f'),
-                                                   format((sensor_pos - initial_pos)[1], '.4f'),
-                                                   format((sensor_pos - initial_pos)[2], '.4f'),
+                                                   format((sensor_pos + agent_state.position - initial_pos)[0], '.4f'),
+                                                   format((sensor_pos + agent_state.position - initial_pos)[1], '.4f'),
+                                                   format((sensor_pos + agent_state.position - initial_pos)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
@@ -272,9 +272,9 @@ while keystroke != ord(FINISH):
     agent_state = agent.get_state()
     sensor_pos = agent._sensors['left_sensor'].specification().position
     file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                     format((sensor_pos - initial_pos)[0], '.4f'),
-                                                     format((sensor_pos - initial_pos)[1], '.4f'),
-                                                     format((sensor_pos - initial_pos)[2], '.4f'),
+                                                     format((sensor_pos + agent_state.position - initial_pos)[0], '.4f'),
+                                                     format((sensor_pos + agent_state.position - initial_pos)[1], '.4f'),
+                                                     format((sensor_pos + agent_state.position - initial_pos)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),

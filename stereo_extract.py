@@ -44,6 +44,11 @@ if not os.path.exists(output_path):
 def transform_rgb_bgr(image):
     return image[:, :, [2, 1, 0]]
 
+def agent_to_world(agent_pos, agent_orientation, cam_pos):
+    rotation_matrix = quaternion.as_rotation_matrix(agent_orientation)
+    return rotation_matrix @ cam_pos + agent_pos
+
+
 def make_cfg(settings):
     sim_cfg = habitat_sim.SimulatorConfiguration()
     sim_cfg.gpu_device_id = 0
@@ -197,11 +202,12 @@ curr_time_rgbd = time.time()
 curr_time = format(curr_time_rgbd, '.6f')
 agent_state = agent.get_state()
 sensor_pos = agent._sensors['left_sensor'].specification().position
-initial_pos = agent_state.position + sensor_pos
+initial_pos = agent_to_world(agent_state.position, agent_state.rotation, sensor_pos)
+sensor_pos_world = initial_pos
 file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                   format((sensor_pos + agent_state.position - initial_pos)[0], '.4f'),
-                                                   format((sensor_pos + agent_state.position - initial_pos)[1], '.4f'),
-                                                   format((sensor_pos + agent_state.position - initial_pos)[2], '.4f'),
+                                                   format((sensor_pos_world - initial_pos)[0], '.4f'),
+                                                   format(-(sensor_pos_world - initial_pos)[1], '.4f'),
+                                                   format(-(sensor_pos_world - initial_pos)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
@@ -270,11 +276,11 @@ while keystroke != ord(FINISH):
     curr_time_rgbd += 1 / frame_rate
     curr_time = format(curr_time_rgbd, '.6f')
     agent_state = agent.get_state()
-    sensor_pos = agent._sensors['left_sensor'].specification().position
+    sensor_pos_world = agent_to_world(agent_state.position, agent_state.rotation, sensor_pos)
     file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                     format((sensor_pos + agent_state.position - initial_pos)[0], '.4f'),
-                                                     format((sensor_pos + agent_state.position - initial_pos)[1], '.4f'),
-                                                     format((sensor_pos + agent_state.position - initial_pos)[2], '.4f'),
+                                                     format((sensor_pos_world - initial_pos)[0], '.4f'),
+                                                     format(-(sensor_pos_world - initial_pos)[1], '.4f'),
+                                                     format(-(sensor_pos_world - initial_pos)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),

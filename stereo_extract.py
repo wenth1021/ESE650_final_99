@@ -28,7 +28,7 @@ FINISH="f"
 frame_rate = 30.0
 
 # save directory
-output_directory = "examples/castle_1"  # @param {type:"string"}
+output_directory = "examples/castle_2"  # @param {type:"string"}
 output_path = os.path.join(output_directory)
 left_path = os.path.join(output_path, "image_0")
 right_path = os.path.join(output_path, "image_1")

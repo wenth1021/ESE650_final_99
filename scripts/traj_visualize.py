@@ -7,6 +7,8 @@ from matplotlib import pyplot as plt
 from PIL import Image
 import habitat_sim
 from habitat.utils.visualizations import maps
+from tqdm import tqdm
+from associate import read_file_list
 
 
 # display a topdown map with matplotlib
@@ -81,9 +83,11 @@ if __name__ == "__main__":
         'first_file', help='ground truth trajectory (format: timestamp tx ty tz qx qy qz qw)')
     parser.add_argument(
         'second_file', help='estimated trajectory (format: timestamp tx ty tz qx qy qz qw)')
-    parser.add_argument('scene_filepath ', help='path to the sence file(.glb)')
+    parser.add_argument('scene_filepath', help='path to the sence file(.glb)')
     args = parser.parse_args()
-    test_scene = "../data/scene_datasets/habitat-test-scenes/apartment_1.glb"
+    test_scene = args.scene_filepath
+    first_file = args.first_file
+    second_file = args.second_file
 
     rgb_sensor = True  # @param {type:"boolean"}
     depth_sensor = True  # @param {type:"boolean"}
@@ -102,23 +106,14 @@ if __name__ == "__main__":
         "enable_physics": False,  # kinematics only
     }
     cfg = make_cfg(sim_settings)
-    # Needed to handle out of order cell run in Colab
-    try:  # Got to make initialization idiot proof
-        sim.close()
-    except NameError:
-        pass
     sim = habitat_sim.Simulator(cfg)
     height = sim.pathfinder.get_bounds()[0][1]
-    meters_per_pixel = 0.1
+    meters_per_pixel = 0.01
 
     hablab_topdown_map = maps.get_topdown_map(
         sim.pathfinder, height, meters_per_pixel=meters_per_pixel
     )
 
-    first_file = './examples/apartment_0/groundtruth.txt'
-    second_file = './examples/apartment_0/CameraTrajectory.txt'
-
-    from associate import read_file_list
     first_list = read_file_list(first_file)
     second_list = read_file_list(second_file)
     matches = first_list.keys()
@@ -139,9 +134,55 @@ if __name__ == "__main__":
         )
         for path_point in second_xyz
     ]
+
+    ground_truth = [
+        maps.to_grid(
+            -path_point[2],
+            path_point[0],
+            grid_dimensions,
+            pathfinder=sim.pathfinder,
+        )
+        for path_point in first_xyz
+    ]
+
     colored_map = maps.colorize_topdown_map(hablab_topdown_map)
     trajectory = np.array(trajectory)
-    ax = plt.subplot(1, 1, 1)
-    plt.imshow(colored_map)
-    plt.scatter(trajectory[:, 1], trajectory[:, 0], linewidth=0.1, color='b')
+    ground_truth = np.array(ground_truth)
+
+    #plt.figure(figsize=(20, 20))
+    fig, ax = plt.subplots()
+    ax.imshow(colored_map)
+    ax.plot(trajectory[:, 1], trajectory[:, 0],
+            linewidth=1, color='b', label='estimated')
+    ax.plot(ground_truth[:, 1], ground_truth[:, 0],
+            linewidth=1, color='r', label='ground truth')
+    ax.legend()
+
     plt.show()
+
+    # curr_traj_x = []
+    # curr_traj_y = []
+    # curr_gt_x = []
+    # curr_gt_y = []
+    # frames = []
+
+    # for i in tqdm(range(trajectory.shape[0])):
+    #     curr_traj_x.append(trajectory[i, 1])
+    #     curr_traj_y.append(trajectory[i, 0])
+    #     curr_gt_x.append(ground_truth[i, 1])
+    #     curr_gt_y.append(ground_truth[i, 0])
+    #     im = ax.imshow(colored_map)
+    #     lines, = ax.plot(curr_traj_x, curr_traj_y,
+    #                      linewidth=1, color='b', animated=True)
+    #     gtlines, = ax.plot(curr_gt_x, curr_gt_y,
+    #                        linewidth=1, color='r', animated=True)
+    #     frames.append([im, lines, gtlines])
+
+    # import matplotlib.animation as animation
+
+    # ani = animation.ArtistAnimation(fig, frames, interval=20, blit=True,
+    #                                 repeat=False)
+
+    # f = r"animation.mp4"
+    # writervideo = animation.FFMpegWriter(fps=30)
+    # ani.save(f, writer=writervideo)

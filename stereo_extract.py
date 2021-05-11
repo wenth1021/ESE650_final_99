@@ -19,32 +19,6 @@ from PIL import Image
 import habitat_sim
 
 
-# Helper function to render observations from the stereo agent
-def _render(sim, display, depth=False):
-    for _ in range(100):
-        # Just spin in a circle
-        obs = sim.step("turn_right")
-        # Put the two stereo observations next to eachother
-        stereo_pair = np.concatenate([obs["left_sensor"], obs["right_sensor"]], axis=1)
-
-        # If it is a depth pair, manually normalize into [0, 1]
-        # so that images are always consistent
-        if depth:
-            stereo_pair = np.clip(stereo_pair, 0, 10)
-            stereo_pair /= 10.0
-
-        # If in RGB/RGBA format, change first to RGB and change to BGR
-        if len(stereo_pair.shape) > 2:
-            stereo_pair = stereo_pair[..., 0:3][..., ::-1]
-
-        # display=False is used for the smoke test
-        if display:
-            cv2.imshow("stereo_pair", stereo_pair)
-            k = cv2.waitKey()
-            if k == ord("q"):
-                break
-
-
 FORWARD_KEY="w"
 LEFT_KEY="a"
 RIGHT_KEY="d"
@@ -54,14 +28,18 @@ FINISH="f"
 frame_rate = 30.0
 
 # save directory
-output_directory = "examples/stereo_apartment_0"  # @param {type:"string"}
+output_directory = "examples/apartment_1"  # @param {type:"string"}
 output_path = os.path.join(output_directory)
 left_path = os.path.join(output_path, "image_0")
 right_path = os.path.join(output_path, "image_1")
+rgb_path = os.path.join(output_path, "rgb")
+depth_path = os.path.join(output_path, "depth")
 if not os.path.exists(output_path):
     os.mkdir(output_path)
     os.mkdir(left_path)
     os.mkdir(right_path)
+    os.mkdir(rgb_path)
+    os.mkdir(depth_path)
 
 def transform_rgb_bgr(image):
     return image[:, :, [2, 1, 0]]
@@ -85,6 +63,14 @@ def make_cfg(settings):
     # and 0.25 meters to the left of the center of the agent
     left_rgb_sensor.position = 1.5 * habitat_sim.geo.UP + 0.25 * habitat_sim.geo.LEFT
     sensor_specs.append(left_rgb_sensor)
+
+    depth_sensor_spec = habitat_sim.CameraSensorSpec()
+    depth_sensor_spec.uuid = "depth_sensor"
+    depth_sensor_spec.sensor_type = habitat_sim.SensorType.DEPTH
+    depth_sensor_spec.resolution = [settings["height"], settings["width"]]
+    depth_sensor_spec.postition = 1.5 * habitat_sim.geo.UP + 0.25 * habitat_sim.geo.LEFT
+    depth_sensor_spec.sensor_subtype = habitat_sim.SensorSubType.PINHOLE
+    sensor_specs.append(depth_sensor_spec)
 
     # Same deal with the right sensor
     right_rgb_sensor = habitat_sim.CameraSensorSpec()
@@ -164,6 +150,21 @@ file_gt.write('# timestamp tx ty tz qx qy qz qw\n')
 file_time = open(os.path.join(output_path, "times.txt"), "w")
 file_time.truncate(0)
 
+file_rgb = open(os.path.join(output_path, "rgb.txt"), "w")
+file_rgb.truncate(0)
+file_rgb.write('# color images\n')
+file_rgb.write('# file: \'rgbd_dataset_freiburg1_xyz.bag\'\n')
+file_rgb.write('# timestamp filename\n')
+
+file_depth = open(os.path.join(output_path, "depth.txt"), "w")
+file_depth.truncate(0)
+file_depth.write('# depth maps\n')
+file_depth.write('# file: \'rgbd_dataset_freiburg1_xyz.bag\'\n')
+file_depth.write('# timestamp filename\n')
+
+file_assoc = open(os.path.join(output_path, "associations.txt"), "w")
+file_assoc.truncate(0)
+
 # save initial frame
 frame_id = 0
 observations = sim.step("do_nothing")
@@ -178,25 +179,41 @@ left_obs = observations["left_sensor"]
 left_img = Image.fromarray(left_obs, mode="RGBA")
 filename = os.path.join(left_path, str(frame_id).zfill(6) + ".png")
 left_img.save(filename)
+filename = os.path.join(rgb_path, str(frame_id) + ".png")
+left_img.save(filename)
 
 right_obs = observations["right_sensor"]
 right_img = Image.fromarray(right_obs, mode="RGBA")
 filename = os.path.join(right_path, str(frame_id).zfill(6) + ".png")
 right_img.save(filename)
 
-curr_time_float = 0.0
-curr_time = "{:e}".format(curr_time_float)
+depth = observations["depth_sensor"]
+depth_img = Image.fromarray((depth / 10 * 255).astype(np.uint8), mode="L")
+filename = os.path.join(depth_path, str(frame_id) + ".png")
+depth_img.save(filename)
+
+curr_time_stereo = 0.0
+curr_time_rgbd = time.time()
+curr_time = format(curr_time_rgbd, '.6f')
 agent_state = agent.get_state()
-initial_height = -agent_state.position[1]
+sensor_pos = agent._sensors['left_sensor'].specification().position
+initial_pos = sensor_pos
 file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                   format(agent_state.position[0], '.4f'),
-                                                   format(-agent_state.position[1] - initial_height, '.4f'),
-                                                   format(-agent_state.position[2], '.4f'),
+                                                   format((sensor_pos - initial_pos)[0], '.4f'),
+                                                   format((sensor_pos - initial_pos)[1], '.4f'),
+                                                   format((sensor_pos - initial_pos)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                    format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
                                                    format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
                                                    ))
+file_rgb.write("{} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png"))
+file_depth.write("{} {}\n".format(curr_time, "depth/" + str(frame_id) + ".png"))
+file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png",
+                                      curr_time, "depth/" + str(frame_id) + ".png"))
+
+
+curr_time = "{:e}".format(curr_time_stereo)
 file_time.write("{}\n".format(curr_time))
 
 frame_id += 1
@@ -236,29 +253,46 @@ while keystroke != ord(FINISH):
     left_img = Image.fromarray(left_obs, mode="RGBA")
     filename = os.path.join(left_path, str(frame_id).zfill(6) + ".png")
     left_img.save(filename)
+    filename = os.path.join(rgb_path, str(frame_id) + ".png")
+    left_img.save(filename)
 
     right_obs = observations["right_sensor"]
     right_img = Image.fromarray(right_obs, mode="RGBA")
     filename = os.path.join(right_path, str(frame_id).zfill(6) + ".png")
     right_img.save(filename)
 
-    curr_time_float += 1 / frame_rate
-    curr_time = "{:e}".format(curr_time_float)
+    depth = observations["depth_sensor"]
+    depth_img = Image.fromarray((depth / 10 * 255).astype(np.uint8), mode="L")
+    filename = os.path.join(depth_path, str(frame_id) + ".png")
+    depth_img.save(filename)
+
+    curr_time_stereo += 1 / frame_rate
+    curr_time_rgbd += 1 / frame_rate
+    curr_time = format(curr_time_rgbd, '.6f')
     agent_state = agent.get_state()
-    initial_height = -agent_state.position[1]
+    sensor_pos = agent._sensors['left_sensor'].specification().position
     file_gt.write("{} {} {} {} {} {} {} {}\n".format(curr_time,
-                                                     format(agent_state.position[0], '.4f'),
-                                                     format(-agent_state.position[1] - initial_height, '.4f'),
-                                                     format(-agent_state.position[2], '.4f'),
+                                                     format((sensor_pos - initial_pos)[0], '.4f'),
+                                                     format((sensor_pos - initial_pos)[1], '.4f'),
+                                                     format((sensor_pos - initial_pos)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[1], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[2], '.4f'),
                                                      format(-quaternion.as_float_array(agent_state.rotation)[3], '.4f'),
                                                      format(quaternion.as_float_array(agent_state.rotation)[0], '.4f'),
                                                      ))
+    file_rgb.write("{} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png"))
+    file_depth.write("{} {}\n".format(curr_time, "depth/" + str(frame_id) + ".png"))
+    file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png",
+                                            curr_time, "depth/" + str(frame_id) + ".png"))
+
+    curr_time = "{:e}".format(curr_time_stereo)
     file_time.write("{}\n".format(curr_time))
 
     frame_id += 1
 
 # close files
 file_gt.close()
+file_rgb.close()
+file_depth.close()
+file_assoc.close()
 file_time.close()

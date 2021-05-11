@@ -107,7 +107,8 @@ if __name__ == "__main__":
     }
     cfg = make_cfg(sim_settings)
     sim = habitat_sim.Simulator(cfg)
-    height = sim.pathfinder.get_bounds()[0][1]
+    #height = sim.pathfinder.get_bounds()[0][1]
+    height = 0.1
     meters_per_pixel = 0.01
 
     hablab_topdown_map = maps.get_topdown_map(
@@ -127,8 +128,8 @@ if __name__ == "__main__":
         hablab_topdown_map.shape[0], hablab_topdown_map.shape[1])
     trajectory = [
         maps.to_grid(
-            -path_point[2],
-            path_point[0],
+            -(path_point[2]) + 19.25,
+            (path_point[0] - 2.04),
             grid_dimensions,
             pathfinder=sim.pathfinder,
         )
@@ -137,8 +138,8 @@ if __name__ == "__main__":
 
     ground_truth = [
         maps.to_grid(
-            -path_point[2],
-            path_point[0],
+            -(path_point[2]) + 19.25,
+            (path_point[0] - 2.04),
             grid_dimensions,
             pathfinder=sim.pathfinder,
         )

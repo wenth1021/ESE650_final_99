@@ -28,7 +28,7 @@ FINISH="f"
 frame_rate = 30.0
 
 # save directory
-output_directory = "examples/apartment_1"  # @param {type:"string"}
+output_directory = "examples/castle_1"  # @param {type:"string"}
 output_path = os.path.join(output_directory)
 left_path = os.path.join(output_path, "image_0")
 right_path = os.path.join(output_path, "image_1")
@@ -66,14 +66,14 @@ def make_cfg(settings):
     left_rgb_sensor.resolution = [settings["height"], settings["width"]]
     # The left RGB sensor will be 1.5 meters off the ground
     # and 0.25 meters to the left of the center of the agent
-    left_rgb_sensor.position = 1.5 * habitat_sim.geo.UP + 0.25 * habitat_sim.geo.LEFT
+    left_rgb_sensor.position = 1.5 * habitat_sim.geo.UP + 0.05 * habitat_sim.geo.LEFT
     sensor_specs.append(left_rgb_sensor)
 
     depth_sensor_spec = habitat_sim.CameraSensorSpec()
     depth_sensor_spec.uuid = "depth_sensor"
     depth_sensor_spec.sensor_type = habitat_sim.SensorType.DEPTH
     depth_sensor_spec.resolution = [settings["height"], settings["width"]]
-    depth_sensor_spec.postition = 1.5 * habitat_sim.geo.UP + 0.25 * habitat_sim.geo.LEFT
+    depth_sensor_spec.postition = 1.5 * habitat_sim.geo.UP + 0.05 * habitat_sim.geo.LEFT
     depth_sensor_spec.sensor_subtype = habitat_sim.SensorSubType.PINHOLE
     sensor_specs.append(depth_sensor_spec)
 
@@ -83,7 +83,7 @@ def make_cfg(settings):
     right_rgb_sensor.resolution = [settings["height"], settings["width"]]
     # The right RGB sensor will be 1.5 meters off the ground
     # and 0.25 meters to the right of the center of the agent
-    right_rgb_sensor.position = 1.5 * habitat_sim.geo.UP + 0.25 * habitat_sim.geo.RIGHT
+    right_rgb_sensor.position = 1.5 * habitat_sim.geo.UP + 0.05 * habitat_sim.geo.RIGHT
     sensor_specs.append(right_rgb_sensor)
 
     # Here you can specify the amount of displacement in a forward action and the turn angle
@@ -91,13 +91,13 @@ def make_cfg(settings):
     agent_cfg.sensor_specifications = sensor_specs
     agent_cfg.action_space = {
         "move_forward": habitat_sim.agent.ActionSpec(
-            "move_forward", habitat_sim.agent.ActuationSpec(amount=0.03)
+            "move_forward", habitat_sim.agent.ActuationSpec(amount=0.05)
         ),
         "turn_left": habitat_sim.agent.ActionSpec(
-            "turn_left", habitat_sim.agent.ActuationSpec(amount=1.0)
+            "turn_left", habitat_sim.agent.ActuationSpec(amount=1.5)
         ),
         "turn_right": habitat_sim.agent.ActionSpec(
-            "turn_right", habitat_sim.agent.ActuationSpec(amount=1.0)
+            "turn_right", habitat_sim.agent.ActuationSpec(amount=1.5)
         ),
         "do_nothing": habitat_sim.agent.ActionSpec(
             "turn_right", habitat_sim.agent.ActuationSpec(amount=0.0)
@@ -106,8 +106,8 @@ def make_cfg(settings):
 
     return habitat_sim.Configuration(sim_cfg, [agent_cfg])
 
-#scene_filepath = "../data/scene_datasets/habitat-test-scenes/skokloster-castle.glb"
-scene_filepath = "../data/scene_datasets/habitat-test-scenes/apartment_1.glb"
+scene_filepath = "../data/scene_datasets/habitat-test-scenes/skokloster-castle.glb"
+#scene_filepath = "../data/scene_datasets/habitat-test-scenes/apartment_1.glb"
 
 sim_settings = {
     "width": 512,  # Spatial resolution of the observations
@@ -135,8 +135,8 @@ sim.seed(sim_settings["seed"])
 # Set agent state
 agent = sim.initialize_agent(sim_settings["default_agent"])
 agent_state = habitat_sim.AgentState()
-agent_state.position = np.array([0.0, 0.0, 0.0])  # world space
-#agent_state.position = np.array([-1.79, 0.11, 19.25])  # world space
+#agent_state.position = np.array([0.0, 0.0, 0.0])  # world space
+agent_state.position = np.array([-1.79, 0.11, 19.25])  # world space
 agent.set_state(agent_state)
 
 # Get agent state
@@ -219,7 +219,7 @@ file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".pn
                                       curr_time, "depth/" + str(frame_id) + ".png"))
 
 
-curr_time = "{:e}".format(curr_time_stereo)
+#curr_time = "{:e}".format(curr_time_stereo)
 file_time.write("{}\n".format(curr_time))
 
 frame_id += 1
@@ -291,7 +291,7 @@ while keystroke != ord(FINISH):
     file_assoc.write("{} {} {} {}\n".format(curr_time, "rgb/" + str(frame_id) + ".png",
                                             curr_time, "depth/" + str(frame_id) + ".png"))
 
-    curr_time = "{:e}".format(curr_time_stereo)
+    #curr_time = "{:e}".format(curr_time_stereo)
     file_time.write("{}\n".format(curr_time))
 
     frame_id += 1
@@ -302,3 +302,4 @@ file_rgb.close()
 file_depth.close()
 file_assoc.close()
 file_time.close()
+sim.close()
